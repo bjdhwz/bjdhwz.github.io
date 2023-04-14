@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <title>RandomRepeat - Random Art Generator</title>
+    <style>
+      body { font-family: monospace; font-size: 15px; }
+      input[type="range"] { width: 100%; }
+      .hidden { display: none; }
+      hr { margin: 0.15em; }
+    </style>
+  </head>
+  <body>
+    <div style="display: flex; justify-content: center; gap: 1em;">
+      <canvas id="canvas" width="768" height="768" style="width: 768px; height: 768px; border: 2px #000 solid; padding: 2px;"></canvas>
+      <div style="width: 320px;">
+        <div style="display: flex; flex-direction: column; gap: 0.5em;">
+          <p style="font-size: 11px; margin: 0;">Random art generator that is based on a very simple rule: pick random value, then randomly choose whether to repeat that value, or pick a new one. Then choose how the next two values would be picked, then four and so on.</p>
+          <hr style="width: 100%;">
+          <div style="display: flex; justify-content: center; gap: 1em;">
+            <div style="display: flex; text-align: center; flex-direction: column;">
+              <input type="radio" id="scale1" name="scale" oninput="draw();" value="1">
+              <label for="scale1">1x</label>
+            </div>
+            <div style="display: flex; text-align: center; flex-direction: column;">
+              <input type="radio" id="scale2" name="scale" oninput="draw();" value="2" checked>
+              <label for="scale2">2x</label>
+            </div>
+            <div style="display: flex; text-align: center; flex-direction: column;">
+              <input type="radio" id="scale3" name="scale" oninput="draw();" value="3">
+              <label for="scale3" style="color: #666;">3x</label>
+            </div>
+            <div style="display: flex; text-align: center; flex-direction: column;">
+              <input type="radio" id="scale4" name="scale" oninput="draw();" value="4">
+              <label for="scale4">4x</label>
+            </div>
+            <div style="display: flex; text-align: center; flex-direction: column;">
+              <input type="radio" id="scale6" name="scale" oninput="draw();" value="6">
+              <label for="scale4" style="color: #666;">6x</label>
+            </div>
+            <div style="display: flex; text-align: center; flex-direction: column;">
+              <input type="radio" id="scale8" name="scale" oninput="draw();" value="8">
+              <label for="scale4">8x</label>
+            </div>
+          </div>
+          <div style="display: flex; gap: 1em;">
+            <label>Random</label>
+            <input type="range" id="entropy" min="0" max="1" value="0.5" step="0.01" oninput="document.getElementById('entropy-value').value = this.value; draw();">
+            <label>Repeat</label>
+          </div>
+          <div style="display: flex; justify-content: center;">
+            <output id="entropy-value" style="width: 1.5em;">0.5</output>
+          </div>
+          <div style="display: flex; gap: 1em;">
+            <label>Repeat limit</label>
+            <input type="range" id="copylimit" min="0" max="15" value="15" step="1" oninput="document.getElementById('copylimit-value').value = this.value; draw();">
+            <output id="copylimit-value" style="width: 2em;">15</output>
+          </div>
+          <div style="display: flex; gap: 1em;">
+            <label>Seed&nbsp;</label>
+            <input type="number" id="seed" oninput="draw();" value="0">
+            <input type="button" onclick="document.getElementById('seed').value = Math.floor((Math.random() - 0.5) * Number.MAX_SAFE_INTEGER); draw();" value="🎲">
+          </div>
+          <hr style="width: 100%;">
+          <div style="display: flex; gap: 1em;">
+            <label>Ratio&nbsp;</label>
+            <input type="range" id="ratio" min="0" max="1" value="0.5" step="0.01" oninput="document.getElementById('ratio-value').value = this.value; draw();">
+            <output id="ratio-value" style="width: 4em;">0.5</output>
+          </div>
+          <div style="display: flex; gap: 1em;">
+            <label>Colors</label>
+            <input type="number" id="colors_num" oninput="draw();" min="2" max="256" value="2">
+          </div>
+          <canvas id="ctx_palette" width="360" height="2" style="height: 1em; border: 2px #000 solid; padding: 2px;"></canvas>
+          <div style="display: flex; justify-content: center;">
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div style="display: flex; text-align: center; flex-direction: column;">
+                <input type="radio" id="gray" name="palette" oninput="draw();" value="gray" checked><label for="gray">Grayscale</label>
+              </div>
+              <div style="display: flex; text-align: center; flex-direction: column;">
+                <input type="radio" id="colorful" name="palette" oninput="draw();" value="colorful"><label for="colorful">Colorful</label>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div style="display: flex; text-align: center; flex-direction: column;">
+                <input type="radio" id="gradient" name="palette" oninput="draw();" value="gradient"><label for="gradient">Gradient</label>
+              </div>
+              <div style="display: flex; text-align: center; flex-direction: column;">
+                <input type="radio" id="gradient2d" name="palette" oninput="draw();" value="gradient2d"><label for="gradient2d">2D Gradient</label>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div style="display: flex; text-align: center; flex-direction: column;">
+                <input type="radio" id="glitch" name="palette" oninput="draw();" value="glitch"><label for="glitch">Glitch</label>
+              </div>
+              <div style="display: flex; text-align: center; flex-direction: column;">
+                <input type="radio" id="difference" name="palette" oninput="draw();" value="difference"><label for="difference">Difference</label>
+              </div>
+            </div>
+          </div>
+          <hr style="width: 100%;">
+          <div style="display: flex; gap: 1em;">
+            <label>W</label><input type="range" id="patterns_w" min="0" max="11" value="0" step="1" oninput="
+              document.getElementById('patterns_w-value').value = pattern_sizes[this.value];
+              if (this.value > 0 || document.getElementById('patterns_h').value > 0) {
+                document.querySelectorAll('.pattern-control').forEach(element => {
+                  element.classList.remove('hidden');
+                });
+              } else {
+                document.querySelectorAll('.pattern-control').forEach(element => {
+                  element.classList.add('hidden');
+                });
+              };
+              draw();">
+            <output id="patterns_w-value" style="width: 2em;">1</output>
+          </div>
+          <div style="display: flex; gap: 1em;">
+            <label>H</label><input type="range" id="patterns_h" min="0" max="11" value="0" step="1" oninput="
+              document.getElementById('patterns_h-value').value = pattern_sizes[this.value];
+              if (this.value > 0 || document.getElementById('patterns_w').value > 0) {
+                document.querySelectorAll('.pattern-control').forEach(element => {
+                  element.classList.remove('hidden');
+                });
+              } else {
+                document.querySelectorAll('.pattern-control').forEach(element => {
+                  element.classList.add('hidden');
+                });
+              };
+              draw();">
+            <output id="patterns_h-value" style="width: 2em;">1</output>
+          </div>
+          <div class="pattern-control hidden">
+            <label>Patterns</label>
+            <input type="number" id="patterns_num" oninput="draw();" min="2" max="256" value="2">
+          </div>
+          <hr style="width: 100%;">
+          <div style="display: flex; justify-content: center;">
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div>
+                <input type="radio" id="column_order" name="order" oninput="draw();" checked>
+              </div>
+              <label for="column_order">Column-major <a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order">↪</a></label>
+              <div>
+                <input type="radio" id="row_order" name="order" oninput="draw();">
+              </div>
+              <label for="row_order">Row-major <a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order">↪</a></label>
+            </div>
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div>
+                <input type="radio" id="z_order" name="order" oninput="draw();">
+              </div>
+              <label for="z_order">Z-order <a href="https://en.wikipedia.org/wiki/Z-order_curve">↪</a></label>
+              <div>
+                <input type="radio" id="hilbert_order" name="order" oninput="draw();">
+              </div>
+              <label for="hilbert_order">Hilbert <a href="https://en.wikipedia.org/wiki/Hilbert_curve">↪</a></label>
+            </div>
+          </div>
+          <div style="display: none;">
+            <input type="checkbox" id="visualize_order" oninput="draw();"><label for="visualize_order">Show drawing order</label>
+          </div>
+          <hr style="width: 100%;">
+          <div style="display: flex; justify-content: center;">
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div>
+                <input type="radio" id="xy1" name="xy" oninput="draw();" checked>
+                <input type="radio" id="xy1_pattern" name="xy_pattern" oninput="draw();" checked class="pattern-control hidden">
+              </div>
+              <label for="xy1">x,y</label>
+            </div>
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div>
+                <input type="radio" id="xy2" name="xy" oninput="draw();">
+                <input type="radio" id="xy2_pattern" name="xy_pattern" oninput="draw();" class="pattern-control hidden">
+              </div>
+              <label for="xy2">x*y</label>
+            </div>
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div>
+                <input type="radio" id="xy3" name="xy" oninput="draw();">
+                <input type="radio" id="xy3_pattern" name="xy_pattern" oninput="draw();" class="pattern-control hidden">
+              </div>
+              <label for="xy3">x<sup>2</sup>+y<sup>2</sup></label>
+            </div>
+          </div>
+          <hr style="width: 100%;">
+          <div style="display: flex; justify-content: center;">
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div>
+                <input type="radio" id="cartesian" name="coordinates" oninput="draw();" checked>
+              </div>
+              <label for="cartesian">Cartesian</label>
+            </div>
+            <div style="display: flex; flex-direction: column; text-align: center; flex: auto;">
+              <div>
+                <input type="radio" id="polar" name="coordinates" oninput="draw();">
+              </div>
+              <label for="polar">Polar</label>
+            </div>
+          </div>
+          <hr style="width: 100%;">
+        </div>
+      </div>
+    </div>
+
+    <script type="application/javascript">
+
+      var pattern_sizes = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64];
+
+      var ctx = document.getElementById("canvas").getContext("2d", { alpha: false });
+      var ctx_palette = document.getElementById("ctx_palette").getContext("2d", { alpha: false });
+      var ctx_w = 768;
+      var ctx_h = 768;
+
+      function z_order(n) {
+        n = n.toString(2).padStart(20, 0).split('');
+        var y = parseInt(n.filter((element, index) => { return index % 2 == 0; }).join(''), 2);
+        var x = parseInt(n.filter((element, index) => { return index % 2 == 1; }).join(''), 2);
+        return [y, x];
+      }
+
+      function rotate(point, rx, ry, n) {
+        if (ry !== 0) {
+          return;
+        }
+        if (rx === 1) {
+          point.x = n - 1 - point.x;
+          point.y = n - 1 - point.y;
+        }
+        [point.x, point.y] = [point.y, point.x];
+      }
+
+      function hilbert_curve(index) {
+        const point = { x: 0, y: 0 };
+        let rx, ry, s;
+        for (let s = 1, t = index; s < 2**10; s *= 2) {
+          rx = 1 & (t / 2);
+          ry = 1 & (t ^ rx);
+          rotate(point, rx, ry, s);
+          point.x += s * rx;
+          point.y += s * ry;
+          t /= 4;
+        }
+        return [point.y, point.x];
+      }
+
+      function toHex(a) {
+        return '#' + 
+          Math.round(a[0], 0).toString(16).padStart(2, '0') +
+          Math.round(a[1], 0).toString(16).padStart(2, '0') +
+          Math.round(a[2], 0).toString(16).padStart(2, '0');
+      }
+
+      function lin2sRGB(lin) {
+        sRGB = [];
+        for (let i = 0; i < 3; i++) {
+            if (lin[i] > 0.0031308) {
+                sRGB.push(1.055 * (lin[i]**(1.0 / 2.4)) - 0.055);
+            } else {
+                sRGB.push(12.92 * lin[i]);
+            }
+        }
+        return sRGB;
+      }
+
+      function sRGB2lin(sRGB) {
+        lin = [];
+        for (let i = 0; i < 3; i++) {
+          if (sRGB[i] <= 0.04045) {
+              lin.push(sRGB[i] / 12.92);
+          } else {
+              lin.push(((sRGB[i] + 0.055)/1.055)**2.4);
+          }
+        }
+        return lin;
+      }
+
+      function draw() {
+
+        var seed = parseInt(document.getElementById("seed").value);
+        var colors_num = parseInt(document.getElementById("colors_num").value);
+        var ratio = parseFloat(document.getElementById("ratio").value);
+        var copylimit = parseFloat(document.getElementById("copylimit").value);
+        var scale = parseInt(document.querySelector('input[name="scale"]:checked').value);
+        var palette = document.querySelector('input[name="palette"]:checked').value;
+        var order = document.querySelector('input[name="order"]:checked').id;
+        var xy = document.querySelector('input[name="xy"]:checked').id;
+        var xy_pattern = document.querySelector('input[name="xy_pattern"]:checked').id;
+        var coordinates = document.querySelector('input[name="coordinates"]:checked').id;
+        var visualize_order = document.getElementById("visualize_order").checked;
+        var entropy = document.getElementById("entropy").value * 100;
+        var patterns_w = pattern_sizes[document.getElementById("patterns_w").value];
+        var patterns_h = pattern_sizes[document.getElementById("patterns_h").value];
+        if (patterns_w == 1 && patterns_h == 1) {
+          var patterns_num = colors_num;
+        } else {
+          var patterns_num = parseInt(document.getElementById("patterns_num").value);
+        }
+
+        function mulberry32(a) {
+          var t = a += 0x6D2B79F5;
+          t = Math.imul(t ^ t >>> 15, t | 1);
+          t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+          return (t ^ t >>> 14) >>> 0;
+        }
+
+        var rnd_i = 0;
+
+        function rnd(a) {
+          rnd_i += 1;
+          seed = mulberry32(seed);
+          var r = Math.floor((seed + (4294967296 * ((ratio-0.5)*2))) / 4294967296 * a);
+          if (r >= a) {
+            return a - 1
+          } else if (r < 0) {
+            return 0;
+          } else {
+            return r;
+          }
+        }
+
+        function rnd_action() {
+          seed = mulberry32(seed);
+          return Math.floor(seed / 4294967296 * 100);
+        }
+
+        function rnd_color() {
+          var color = [];
+          for (let i = 0; i < 3; i++) {
+            seed = mulberry32(seed);
+            color.push(Math.floor(seed / 4294967296 * 255));
+          }
+          return color;
+        }
+
+        function random_repeat(length, n) {
+          var ln = 2**((length - 1).toString(2).length + 1);
+          var a = [rnd(n)];
+          var i = 1;
+
+          while (i < ln) {
+            var action = rnd_action();
+
+            if (action < entropy) {
+              var k = 0;
+              var r = i;
+
+              for (let j = 0; j < copylimit; j++) {
+                if (r % 2 != 0) { break; }
+                r /= 2;
+                k += 1;
+              }
+              a.push(...a.slice(-(2**k)));
+              i += 2**k;
+            } else {
+              a.push(rnd(n));
+              i += 1;
+            }
+          }
+          return a;
+        }
+
+        var colors = [];
+        for (let i = 0; i < colors_num; i++) {
+          if (palette == 'gray') {
+            var clr = Math.floor(255/(colors_num-1) * i);
+            colors[i] = toHex([clr, clr, clr]);
+          } else if (palette == 'colorful') {
+            colors[i] = [toHex(rnd_color())];
+          } else if (palette == 'gradient' || palette == 'glitch') {
+            colors[i] = [rnd_color(), rnd_color()];
+          } else if (palette == 'gradient2d') {
+            colors[i] = [rnd_color(), rnd_color(), rnd_color(), rnd_color()];
+          } else if (palette == 'difference') {
+            base = [rnd_color(), rnd_color(), rnd_color(), rnd_color()];
+            colors[i] = Math.floor(256/(colors_num-1) * i - 0.5);
+          }
+        }
+
+        for (let i = 0; i < colors.length; i++) {
+          var w = document.getElementById('ctx_palette').width;
+          if (palette == 'gradient' || palette == 'glitch') {
+            ctx_palette.fillStyle = toHex(colors[i][0]);
+            ctx_palette.fillRect(w/colors.length/2*i, 0, w/colors.length/2, 2);
+            ctx_palette.fillStyle = toHex(colors[i][1]);
+            ctx_palette.fillRect(w/colors.length/2*i+w/colors.length, 0, w/colors.length/2, 2);
+          } else if (palette == 'gradient2d') {
+            ctx_palette.fillStyle = toHex(colors[i][0]);
+            ctx_palette.fillRect(w/colors.length/2*i, 0, w/colors.length/2, 2);
+            ctx_palette.fillStyle = toHex(colors[i][1]);
+            ctx_palette.fillRect(w/colors.length/2*i+w/colors.length, 0, w/colors.length/2, 2);
+            ctx_palette.fillStyle = toHex(colors[i][2]);
+            ctx_palette.fillRect(w/colors.length/2*i, 1, w/colors.length/2, 1);
+            ctx_palette.fillStyle = toHex(colors[i][3]);
+            ctx_palette.fillRect(w/colors.length/2*i+w/colors.length, 1, w/colors.length/2, 1);
+          } else if (palette == 'difference') {
+          } else {
+            ctx_palette.fillStyle = colors[i];
+            ctx_palette.fillRect(w/colors.length*i, 0, w/colors.length, 2);
+          }
+        }
+
+        var patterns = [];
+
+        if (patterns_w == 1 && patterns_h == 1) {
+          for (let i = 0; i < patterns_num; i++) {
+            patterns.push([i]);
+          }
+        } else {
+          for (let i = 0; i < patterns_num; i++) {
+            var pattern = random_repeat(patterns_w * patterns_h, colors_num);
+            patterns.push(pattern);
+          }
+        }
+
+        var w = Math.ceil(1024 / scale / patterns_w);
+        var h = Math.ceil(1024 / scale / patterns_h);
+
+        var seq = random_repeat(Math.ceil(w * h), patterns_num);
+        ctx.fillStyle = "rgb(255, 255, 255)";
+        ctx.fillRect(0, 0, ctx_w, ctx_h);
+        ctx.lineWidth = 1;
+
+        var i = 0;
+
+        for (let y = 0; y < w; y++) {
+
+          for (let x = 0; x < h; x++) {
+            if (order == "row_order") {
+              var crd = [x, y];
+            } else if (order == "column_order") {
+              var crd = [y, x];
+            } else if (order == "z_order") {
+              var crd = z_order(y*h+x);
+            } else if (order == "hilbert_order") {
+              var crd = hilbert_curve(y*h+x);
+            }
+
+            if (xy == "xy1") {
+              var pattern = patterns[seq[y*h+x]];
+            } else if (xy == "xy2") {
+              var pattern = patterns[seq[(x+1)*(y+1)]];
+            } else if (xy == "xy3") {
+              var pattern = patterns[seq[Math.floor((x/2)**2+(y/2)**2)]];
+            }
+
+            for (let p_y = 0; p_y < patterns_h; p_y++) {
+
+              for (let p_x = 0; p_x < patterns_w; p_x++) {
+                if (order == "row_order") {
+                  var x1 = (crd[0]*patterns_h+p_y)*scale;
+                  var y1 = (crd[1]*patterns_w+p_x)*scale;
+                } else if (order == "column_order") {
+                  var x1 = (crd[0]*patterns_w+p_x)*scale;
+                  var y1 = (crd[1]*patterns_h+p_y)*scale;
+                } else if (order == "z_order") { // todo
+                  var x1 = (crd[0]*patterns_h+p_y)*scale;
+                  var y1 = (crd[1]*patterns_w+p_x)*scale;
+                } else if (order == "hilbert_order") { // todo
+                  var x1 = (crd[0]*patterns_h+p_y)*scale;
+                  var y1 = (crd[1]*patterns_w+p_x)*scale;
+                }
+
+                if (xy_pattern == "xy1_pattern") {
+                  var value = pattern[p_y*(2**Math.floor(patterns_w**0.5-1))+p_x];
+                } else if (xy_pattern == "xy2_pattern") {
+                  var value = pattern[(p_y+1)*(p_x+1)-1];
+                } else if (xy_pattern == "xy3_pattern") {
+                  var value = pattern[Math.floor((p_x/2)**2+(p_y/2)**2)];
+                }
+
+                if ((x1 < ctx_w) && (y1 < ctx_h)) {
+                  if (visualize_order) {
+                    ctx.fillStyle = toHex([i, i, i]);
+                    i += 1/(w*patterns_w*h*patterns_h/256);
+                  } else {
+                    if (palette == 'gradient') {
+                      lin_a = sRGB2lin(colors[value][0]);
+                      lin_b = sRGB2lin(colors[value][1]);
+                      ctx.fillStyle = toHex(lin2sRGB([
+                        lin_a[0] * (x1 / ctx_w) + lin_b[0] * (1 - x1 / ctx_w),
+                        lin_a[1] * (x1 / ctx_w) + lin_b[1] * (1 - x1 / ctx_w),
+                        lin_a[2] * (x1 / ctx_w) + lin_b[2] * (1 - x1 / ctx_w)
+                      ]));
+                    } else if (palette == 'gradient2d') {
+                      lin_a = sRGB2lin(colors[value][0]);
+                      lin_b = sRGB2lin(colors[value][1]);
+                      lin_c = sRGB2lin(colors[value][2]);
+                      lin_d = sRGB2lin(colors[value][3]);
+                      ctx.fillStyle = toHex(lin2sRGB([
+                        (lin_a[0] * (x1 / ctx_w) + lin_b[0] * (1 - x1 / ctx_w)) * (y1 / ctx_h) + (lin_c[0] * (x1 / ctx_w) + lin_d[0] * (1 - x1 / ctx_w)) * (1 - y1 / ctx_h),
+                        (lin_a[1] * (x1 / ctx_w) + lin_b[1] * (1 - x1 / ctx_w)) * (y1 / ctx_h) + (lin_c[1] * (x1 / ctx_w) + lin_d[1] * (1 - x1 / ctx_w)) * (1 - y1 / ctx_h),
+                        (lin_a[2] * (x1 / ctx_w) + lin_b[2] * (1 - x1 / ctx_w)) * (y1 / ctx_h) + (lin_c[2] * (x1 / ctx_w) + lin_d[2] * (1 - x1 / ctx_w)) * (1 - y1 / ctx_h)
+                      ]));
+                    } else if (palette == 'glitch') {
+                      ctx.fillStyle = toHex([
+                        colors[value][0][0] * (x1 / ctx_w) * 2 + colors[value][1][0] * (1 - x1 / ctx_w) * 2,
+                        colors[value][0][1] * (x1 / ctx_w) * 2 + colors[value][1][1] * (1 - x1 / ctx_w) * 2,
+                        colors[value][0][2] * (x1 / ctx_w) * 2 + colors[value][1][2] * (1 - x1 / ctx_w) * 2
+                      ]);
+                    } else if (palette == 'difference') {
+                      var clr = ([
+                        (base[0][0] * (x1 / ctx_w) + base[1][0] * (1 - x1 / ctx_w)) * (y1 / ctx_h) + (base[2][0] * (x1 / ctx_w) + base[3][0] * (1 - x1 / ctx_w)) * (1 - y1 / ctx_h) - colors[value],
+                        (base[0][1] * (x1 / ctx_w) + base[1][1] * (1 - x1 / ctx_w)) * (y1 / ctx_h) + (base[2][1] * (x1 / ctx_w) + base[3][1] * (1 - x1 / ctx_w)) * (1 - y1 / ctx_h) - colors[value],
+                        (base[0][2] * (x1 / ctx_w) + base[1][2] * (1 - x1 / ctx_w)) * (y1 / ctx_h) + (base[2][2] * (x1 / ctx_w) + base[3][2] * (1 - x1 / ctx_w)) * (1 - y1 / ctx_h) - colors[value]
+                      ]);
+                      ctx.fillStyle = toHex(clr);
+                    } else {
+                      ctx.fillStyle = colors[value];
+                    }
+                  }
+
+                  if (coordinates == 'cartesian') {
+                    ctx.fillRect(x1, y1, scale, scale);
+                  } else if (coordinates == 'polar') {
+                    ctx.strokeStyle = ctx.fillStyle;
+
+                    if (palette == 'gradient') {
+                      var gradient = ctx.createRadialGradient(384, 384, 0, 384, 384, 384);
+                      gradient.addColorStop(0, toHex(colors[value][0]));
+                      gradient.addColorStop(1, toHex(colors[value][1]));
+                      ctx.strokeStyle = gradient;
+                    }
+
+                    ctx.lineWidth = scale + 0.5;
+                    ctx.beginPath();
+                    ctx.arc(ctx_w / 2, ctx_h / 2, y1, Math.PI * 2 * (x1 / ctx_w), Math.PI * 2 * ((x1 + scale + 0.5) / ctx_w));
+                    ctx.stroke();
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      draw();
+
+    </script>
+  </body>
+</html>
+ 
