@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Procedural 2D Gradient using WebGL</title>
+    <style>
+      body { font-family: monospace; font-size: 15px; }
+      input[type="range"] { width: 100%; }
+      hr { margin: 0.15rem; }
+      #slider-bundle { display: flex; gap: 1rem; }
+      #slider { display: flex; flex-direction: column; }
+    </style>
+  </head>
+  <body>
+    <div style="display: flex; justify-content: center; gap: 1rem;">
+      <canvas id="canvas" width="256" width="256" style="width: 256px; height: 256px; position: absolute; top: 100px; z-index: -1"></canvas>
+      <canvas id="cnv" width="768" height="768" style="border: 2px #000 solid; padding: 2px;"></canvas>
+<div style="width: 360px; height: 768px;">
+    <p style="font-size: 11px;">Procedural 2D gradient based on a classic cosine palette formula. Uses WebGL for performance.</p>
+    <hr>
+    <h3 style="text-align: center; ">X</h3>
+    <span>Constant</span>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="constantrx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantrxv').value = this.value; draw();">
+            <output id="constantrxv" style="width: 4rem;">0.5</output>
+        </div>
+        <div id="slider">
+            <input id="constantgx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantgxv').value = this.value; draw();">
+            <output id="constantgxv" style="width: 4rem;">0.5</output>
+        </div>
+        <div id="slider">
+            <input id="constantbx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantbxv').value = this.value; draw();">
+            <output id="constantbxv" style="width: 4rem;">0.5</output>
+        </div>
+    </div>
+    <span>Multiplier</span>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="multirx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multirxv').value = this.value; draw();">
+            <output id="multirxv" style="width: 4rem;">0.5</output>
+        </div>
+        <div id="slider">
+            <input id="multigx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multigxv').value = this.value; draw();">
+            <output id="multigxv" style="width: 4rem;">0.5</output>
+        </div>
+        <div id="slider">
+            <input id="multibx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multibxv').value = this.value; draw();">
+            <output id="multibxv" style="width: 4rem;">0.5</output>
+        </div>
+    </div>
+    <span>Repeat</span>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="repeatrx" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatrxv').value = this.value; draw();">
+            <output id="repeatrxv" style="width: 4rem;">1.0</output>
+        </div>
+        <div id="slider">
+            <input id="repeatgx" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatgxv').value = this.value; draw();">
+            <output id="repeatgxv" style="width: 4rem;">1.0</output>
+        </div>
+        <div id="slider">
+            <input id="repeatbx" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatbxv').value = this.value; draw();">
+            <output id="repeatbxv" style="width: 4rem;">1.0</output>
+        </div>
+    </div>
+    <span>Phase</span>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="phaserx" type="range" value="0.0" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phaserxv').value = this.value; draw();">
+            <output id="phaserxv" style="width: 4rem;">0.0</output>
+        </div>
+        <div id="slider">
+            <input id="phasegx" type="range" value="0.67" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phasegxv').value = this.value; draw();">
+            <output id="phasegxv" style="width: 4rem;">0.67</output>
+        </div>
+        <div id="slider">
+            <input id="phasebx" type="range" value="0.33" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phasebxv').value = this.value; draw();">
+            <output id="phasebxv" style="width: 4rem;">0.33</output>
+        </div>
+    </div>
+    <h3 style="text-align: center;">Y</h3>
+    <span>Constant</span>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="constantry" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantryv').value = this.value; draw();">
+            <output id="constantryv" style="width: 4rem;">0.5</output>
+        </div>
+        <div id="slider">
+            <input id="constantgy" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantgyv').value = this.value; draw();">
+            <output id="constantgyv" style="width: 4rem;">0.5</output>
+        </div>
+        <div id="slider">
+            <input id="constantby" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantbyv').value = this.value; draw();">
+            <output id="constantbyv" style="width: 4rem;">0.5</output>
+        </div>
+    </div>
+    <span>Multiplier</span>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="multiry" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multiryv').value = this.value; draw();">
+            <output id="multiryv" style="width: 4rem;">0.5</output>
+        </div>
+        <div id="slider">
+            <input id="multigy" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multigyv').value = this.value; draw();">
+            <output id="multigyv" style="width: 4rem;">0.5</output>
+        </div>
+        <div id="slider">
+            <input id="multiby" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multibyv').value = this.value; draw();">
+            <output id="multibyv" style="width: 4rem;">0.5</output>
+        </div>
+    </div>
+    <span>Repeat</span>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="repeatry" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatryv').value = this.value; draw();">
+            <output id="repeatryv" style="width: 4rem;">1.0</output>
+        </div>
+        <div id="slider">
+            <input id="repeatgy" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatgyv').value = this.value; draw();">
+            <output id="repeatgyv" style="width: 4rem;">1.0</output>
+        </div>
+        <div id="slider">
+            <input id="repeatby" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatbyv').value = this.value; draw();">
+            <output id="repeatbyv" style="width: 4rem;">1.0</output>
+        </div>
+    </div>
+    <span>Phase</span>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="phasery" type="range" value="0.0" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phaseryv').value = this.value; draw();">
+            <output id="phaseryv" style="width: 4rem;">0.0</output>
+        </div>
+        <div id="slider">
+            <input id="phasegy" type="range" value="0.67" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phasegyv').value = this.value; draw();">
+            <output id="phasegyv" style="width: 4rem;">0.67</output>
+        </div>
+        <div id="slider">
+            <input id="phaseby" type="range" value="0.33" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phasebyv').value = this.value; draw();">
+            <output id="phasebyv" style="width: 4rem;">0.33</output>
+        </div>
+    </div>
+    <div style='display: flex;'>
+        <div style='width: 120px; text-align: center;'>Red</div>
+        <div style='width: 120px; text-align: center;'>Green</div>
+        <div style='width: 120px; text-align: center;'>Blue</div>
+    </div>
+    <div style="text-align: center; margin-top: 2em;">
+        <input type="button" onclick="
+r = Math.round(Math.random() * 100) / 100; document.getElementById('constantrx').value = r; document.getElementById('constantrxv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('constantgx').value = r; document.getElementById('constantgxv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('constantbx').value = r; document.getElementById('constantbxv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('multirx').value = r; document.getElementById('multirxv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('multigx').value = r; document.getElementById('multigxv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('multibx').value = r; document.getElementById('multibxv').value = r;
+r = Math.round(Math.random() * 4); document.getElementById('repeatrx').value = r; document.getElementById('repeatrxv').value = r;
+r = Math.round(Math.random() * 4); document.getElementById('repeatgx').value = r; document.getElementById('repeatgxv').value = r;
+r = Math.round(Math.random() * 4); document.getElementById('repeatbx').value = r; document.getElementById('repeatbxv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('phaserx').value = r; document.getElementById('phaserxv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('phasegx').value = r; document.getElementById('phasegxv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('phasebx').value = r; document.getElementById('phasebxv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('constantry').value = r; document.getElementById('constantryv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('constantgy').value = r; document.getElementById('constantgyv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('constantby').value = r; document.getElementById('constantbyv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('multiry').value = r; document.getElementById('multiryv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('multigy').value = r; document.getElementById('multigyv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('multiby').value = r; document.getElementById('multibyv').value = r;
+r = Math.round(Math.random() * 4); document.getElementById('repeatry').value = r; document.getElementById('repeatryv').value = r;
+r = Math.round(Math.random() * 4); document.getElementById('repeatgy').value = r; document.getElementById('repeatgyv').value = r;
+r = Math.round(Math.random() * 4); document.getElementById('repeatby').value = r; document.getElementById('repeatbyv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('phasery').value = r; document.getElementById('phaseryv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('phasegy').value = r; document.getElementById('phasegyv').value = r;
+r = Math.round(Math.random() * 100) / 100; document.getElementById('phaseby').value = r; document.getElementById('phasebyv').value = r;
+draw();
+" value="🎲" style="width: 7.2rem; font-size: 1.2rem" title="Randomize">
+        <a href="proc2dgradwebgl.html"><input type="button" value="↺" style="width: 7.2rem; font-size: 1.2rem" title="Reset"></a>
+    </div>
+</div>
+    </div>
+
+<script>
+function draw() {
+  var constantrx = document.querySelector("#constantrx"); var constantrxl = gl.getUniformLocation(program, "constantrx"); gl.uniform1f(constantrxl, constantrx.valueAsNumber);
+  var constantgx = document.querySelector("#constantgx"); var constantgxl = gl.getUniformLocation(program, "constantgx"); gl.uniform1f(constantgxl, constantgx.valueAsNumber);
+  var constantbx = document.querySelector("#constantbx"); var constantbxl = gl.getUniformLocation(program, "constantbx"); gl.uniform1f(constantbxl, constantbx.valueAsNumber);
+  var multirx = document.querySelector("#multirx"); var multirxl = gl.getUniformLocation(program, "multirx"); gl.uniform1f(multirxl, multirx.valueAsNumber);
+  var multigx = document.querySelector("#multigx"); var multigxl = gl.getUniformLocation(program, "multigx"); gl.uniform1f(multigxl, multigx.valueAsNumber);
+  var multibx = document.querySelector("#multibx"); var multibxl = gl.getUniformLocation(program, "multibx"); gl.uniform1f(multibxl, multibx.valueAsNumber);
+  var repeatrx = document.querySelector("#repeatrx"); var repeatrxl = gl.getUniformLocation(program, "repeatrx"); gl.uniform1f(repeatrxl, repeatrx.valueAsNumber);
+  var repeatgx = document.querySelector("#repeatgx"); var repeatgxl = gl.getUniformLocation(program, "repeatgx"); gl.uniform1f(repeatgxl, repeatgx.valueAsNumber);
+  var repeatbx = document.querySelector("#repeatbx"); var repeatbxl = gl.getUniformLocation(program, "repeatbx"); gl.uniform1f(repeatbxl, repeatbx.valueAsNumber);
+  var phaserx = document.querySelector("#phaserx"); var phaserxl = gl.getUniformLocation(program, "phaserx"); gl.uniform1f(phaserxl, phaserx.valueAsNumber);
+  var phasegx = document.querySelector("#phasegx"); var phasegxl = gl.getUniformLocation(program, "phasegx"); gl.uniform1f(phasegxl, phasegx.valueAsNumber);
+  var phasebx = document.querySelector("#phasebx"); var phasebxl = gl.getUniformLocation(program, "phasebx"); gl.uniform1f(phasebxl, phasebx.valueAsNumber);
+  var constantry = document.querySelector("#constantry"); var constantryl = gl.getUniformLocation(program, "constantry"); gl.uniform1f(constantryl, constantry.valueAsNumber);
+  var constantgy = document.querySelector("#constantgy"); var constantgyl = gl.getUniformLocation(program, "constantgy"); gl.uniform1f(constantgyl, constantgy.valueAsNumber);
+  var constantby = document.querySelector("#constantby"); var constantbyl = gl.getUniformLocation(program, "constantby"); gl.uniform1f(constantbyl, constantby.valueAsNumber);
+  var multiry = document.querySelector("#multiry"); var multiryl = gl.getUniformLocation(program, "multiry"); gl.uniform1f(multiryl, multiry.valueAsNumber);
+  var multigy = document.querySelector("#multigy"); var multigyl = gl.getUniformLocation(program, "multigy"); gl.uniform1f(multigyl, multigy.valueAsNumber);
+  var multiby = document.querySelector("#multiby"); var multibyl = gl.getUniformLocation(program, "multiby"); gl.uniform1f(multibyl, multiby.valueAsNumber);
+  var repeatry = document.querySelector("#repeatry"); var repeatryl = gl.getUniformLocation(program, "repeatry"); gl.uniform1f(repeatryl, repeatry.valueAsNumber);
+  var repeatgy = document.querySelector("#repeatgy"); var repeatgyl = gl.getUniformLocation(program, "repeatgy"); gl.uniform1f(repeatgyl, repeatgy.valueAsNumber);
+  var repeatby = document.querySelector("#repeatby"); var repeatbyl = gl.getUniformLocation(program, "repeatby"); gl.uniform1f(repeatbyl, repeatby.valueAsNumber);
+  var phasery = document.querySelector("#phasery"); var phaseryl = gl.getUniformLocation(program, "phasery"); gl.uniform1f(phaseryl, phasery.valueAsNumber);
+  var phasegy = document.querySelector("#phasegy"); var phasegyl = gl.getUniformLocation(program, "phasegy"); gl.uniform1f(phasegyl, phasegy.valueAsNumber);
+  var phaseby = document.querySelector("#phaseby"); var phasebyl = gl.getUniformLocation(program, "phaseby"); gl.uniform1f(phasebyl, phaseby.valueAsNumber);
+  gl.drawArrays(gl.POINTS, 0, 1);
+
+  var newCanvas = document.querySelector('#cnv');
+  var context = newCanvas.getContext('2d');
+  context.drawImage(canvas, 0, 0, 768, 768);
+}
+
+function getRenderingContext() {
+  const canvas = document.querySelector("canvas");
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+  const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+  //gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  //gl.clearColor(0.0, 0.0, 0.0, 1.0);
+  //gl.clear(gl.COLOR_BUFFER_BIT);
+  return gl;
+}
+
+window.addEventListener("load", setupWebGL, false);
+
+let gl;
+let program;
+
+function setupWebGL(evt) {
+  window.removeEventListener(evt.type, setupWebGL, false);
+  if (!(gl = getRenderingContext())) return;
+
+  let source = document.querySelector("#vertex-shader").innerHTML;
+  const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertexShader, source);
+  gl.compileShader(vertexShader);
+
+  source = document.querySelector("#fragment-shader").innerHTML;
+  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragmentShader, source);
+  gl.compileShader(fragmentShader);
+
+  program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
+  gl.detachShader(program, vertexShader);
+  gl.detachShader(program, fragmentShader);
+  gl.deleteShader(vertexShader);
+  gl.deleteShader(fragmentShader);
+  initializeAttributes();
+  gl.useProgram(program);
+
+  draw();
+}
+
+let buffer;
+function initializeAttributes() {
+  gl.enableVertexAttribArray(0);
+  buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0]), gl.STATIC_DRAW);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+}
+</script>
+
+<script type="x-shader/x-vertex" id="vertex-shader">
+  precision highp float;
+  attribute vec2 position;
+  void main() {
+    gl_Position = vec4(position, 0.0, 1.0);
+    gl_PointSize = 256.0;
+  }
+</script>
+
+<script type="x-shader/x-fragment" id="fragment-shader">
+precision mediump float;
+vec3 pal(
+    in float x, in vec3 ax, in vec3 bx, in vec3 cx, in vec3 dx,
+    in float y, in vec3 ay, in vec3 by, in vec3 cy, in vec3 dy
+)
+{
+    return ((ax + bx * cos(6.28318 * (cx * x + dx))) + (ay + by * cos(6.28318 * (cy * y + dy)))) * 0.5;
+}
+
+uniform float constantrx;
+uniform float constantgx;
+uniform float constantbx;
+uniform float multirx;
+uniform float multigx;
+uniform float multibx;
+uniform float repeatrx;
+uniform float repeatgx;
+uniform float repeatbx;
+uniform float phaserx;
+uniform float phasegx;
+uniform float phasebx;
+uniform float constantry;
+uniform float constantgy;
+uniform float constantby;
+uniform float multiry;
+uniform float multigy;
+uniform float multiby;
+uniform float repeatry;
+uniform float repeatgy;
+uniform float repeatby;
+uniform float phasery;
+uniform float phasegy;
+uniform float phaseby;
+
+void main() {
+    vec2 p = gl_PointCoord.xy;
+    vec3 col = pal(
+        p.x, vec3(constantrx,constantgx,constantbx), vec3(multirx,multigx,multibx), vec3(repeatrx,repeatgx,repeatbx), vec3(phaserx,phasegx,phasebx),
+        p.y, vec3(constantry,constantgy,constantby), vec3(multiry,multigy,multiby), vec3(repeatry,repeatgy,repeatby), vec3(phasery,phasegy,phaseby)
+    );
+    gl_FragColor = vec4(col, 1.0);
+}
+</script>
+  </body>
+</html>
