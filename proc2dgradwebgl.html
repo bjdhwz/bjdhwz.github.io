@@ -18,7 +18,12 @@
 <div style="width: 360px; height: 768px;">
     <p style="font-size: 11px;">Procedural 2D gradient based on a classic cosine palette formula. Uses WebGL for performance.</p>
     <hr>
-    <h3 style="text-align: center; ">X</h3>
+    <h3 style="text-align: center; margin-bottom: 0;">X</h3>
+    <div style='display: flex;'>
+        <div style='width: 120px; text-align: center;'>Red</div>
+        <div style='width: 120px; text-align: center;'>Green</div>
+        <div style='width: 120px; text-align: center;'>Blue</div>
+    </div>
     <span>Constant</span>
     <div id="slider-bundle">
         <div id="slider">
@@ -79,7 +84,14 @@
             <output id="phasebxv" style="width: 4rem;">0.33</output>
         </div>
     </div>
-    <h3 style="text-align: center;">Y</h3>
+    <div style="text-align: center;">Rotation</div>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="rotx" type="range" value="0" min="-90" max="90" step="1" oninput="document.getElementById('rotxv').value = this.value; draw();">
+            <output id="rotxv" style="width: 22.5rem; text-align: center;">0</output>
+        </div>
+    </div>
+    <h3 style="text-align: center; margin-bottom: 0;">Y</h3>
     <span>Constant</span>
     <div id="slider-bundle">
         <div id="slider">
@@ -140,12 +152,14 @@
             <output id="phasebyv" style="width: 4rem;">0.33</output>
         </div>
     </div>
-    <div style='display: flex;'>
-        <div style='width: 120px; text-align: center;'>Red</div>
-        <div style='width: 120px; text-align: center;'>Green</div>
-        <div style='width: 120px; text-align: center;'>Blue</div>
+    <div style="text-align: center;">Rotation</div>
+    <div id="slider-bundle">
+        <div id="slider">
+            <input id="roty" type="range" value="0" min="-90" max="90" step="1" oninput="document.getElementById('rotyv').value = this.value; draw();">
+            <output id="rotyv" style="width: 22.5rem; text-align: center;">0</output>
+        </div>
     </div>
-    <div style="text-align: center; margin-top: 2em;">
+    <div style="text-align: center; margin-top: 1em;">
         <input type="button" onclick="
 r = Math.round(Math.random() * 100) / 100; document.getElementById('constantrx').value = r; document.getElementById('constantrxv').value = r;
 r = Math.round(Math.random() * 100) / 100; document.getElementById('constantgx').value = r; document.getElementById('constantgxv').value = r;
@@ -159,6 +173,7 @@ r = Math.round(Math.random() * 4); document.getElementById('repeatbx').value = r
 r = Math.round(Math.random() * 100) / 100; document.getElementById('phaserx').value = r; document.getElementById('phaserxv').value = r;
 r = Math.round(Math.random() * 100) / 100; document.getElementById('phasegx').value = r; document.getElementById('phasegxv').value = r;
 r = Math.round(Math.random() * 100) / 100; document.getElementById('phasebx').value = r; document.getElementById('phasebxv').value = r;
+r = Math.round(Math.random() * 180) - 90; document.getElementById('rotx').value = r; document.getElementById('rotxv').value = r;
 r = Math.round(Math.random() * 100) / 100; document.getElementById('constantry').value = r; document.getElementById('constantryv').value = r;
 r = Math.round(Math.random() * 100) / 100; document.getElementById('constantgy').value = r; document.getElementById('constantgyv').value = r;
 r = Math.round(Math.random() * 100) / 100; document.getElementById('constantby').value = r; document.getElementById('constantbyv').value = r;
@@ -171,6 +186,7 @@ r = Math.round(Math.random() * 4); document.getElementById('repeatby').value = r
 r = Math.round(Math.random() * 100) / 100; document.getElementById('phasery').value = r; document.getElementById('phaseryv').value = r;
 r = Math.round(Math.random() * 100) / 100; document.getElementById('phasegy').value = r; document.getElementById('phasegyv').value = r;
 r = Math.round(Math.random() * 100) / 100; document.getElementById('phaseby').value = r; document.getElementById('phasebyv').value = r;
+r = Math.round(Math.random() * 180) - 90; document.getElementById('roty').value = r; document.getElementById('rotyv').value = r;
 draw();
 " value="🎲" style="width: 7.2rem; font-size: 1.2rem" title="Randomize">
         <a href="proc2dgradwebgl.html"><input type="button" value="↺" style="width: 7.2rem; font-size: 1.2rem" title="Reset"></a>
@@ -192,6 +208,7 @@ function draw() {
   var phaserx = document.querySelector("#phaserx"); var phaserxl = gl.getUniformLocation(program, "phaserx"); gl.uniform1f(phaserxl, phaserx.valueAsNumber);
   var phasegx = document.querySelector("#phasegx"); var phasegxl = gl.getUniformLocation(program, "phasegx"); gl.uniform1f(phasegxl, phasegx.valueAsNumber);
   var phasebx = document.querySelector("#phasebx"); var phasebxl = gl.getUniformLocation(program, "phasebx"); gl.uniform1f(phasebxl, phasebx.valueAsNumber);
+  var rotx = document.querySelector("#rotx"); var rotxl = gl.getUniformLocation(program, "rotx"); gl.uniform1f(rotxl, rotx.valueAsNumber);
   var constantry = document.querySelector("#constantry"); var constantryl = gl.getUniformLocation(program, "constantry"); gl.uniform1f(constantryl, constantry.valueAsNumber);
   var constantgy = document.querySelector("#constantgy"); var constantgyl = gl.getUniformLocation(program, "constantgy"); gl.uniform1f(constantgyl, constantgy.valueAsNumber);
   var constantby = document.querySelector("#constantby"); var constantbyl = gl.getUniformLocation(program, "constantby"); gl.uniform1f(constantbyl, constantby.valueAsNumber);
@@ -204,6 +221,7 @@ function draw() {
   var phasery = document.querySelector("#phasery"); var phaseryl = gl.getUniformLocation(program, "phasery"); gl.uniform1f(phaseryl, phasery.valueAsNumber);
   var phasegy = document.querySelector("#phasegy"); var phasegyl = gl.getUniformLocation(program, "phasegy"); gl.uniform1f(phasegyl, phasegy.valueAsNumber);
   var phaseby = document.querySelector("#phaseby"); var phasebyl = gl.getUniformLocation(program, "phaseby"); gl.uniform1f(phasebyl, phaseby.valueAsNumber);
+  var rotx = document.querySelector("#roty"); var rotyl = gl.getUniformLocation(program, "roty"); gl.uniform1f(rotyl, roty.valueAsNumber);
   gl.drawArrays(gl.POINTS, 0, 1);
 
   var newCanvas = document.querySelector('#cnv');
@@ -277,11 +295,26 @@ function initializeAttributes() {
 <script type="x-shader/x-fragment" id="fragment-shader">
 precision mediump float;
 vec3 pal(
-    in float x, in vec3 ax, in vec3 bx, in vec3 cx, in vec3 dx,
-    in float y, in vec3 ay, in vec3 by, in vec3 cy, in vec3 dy
+    in float x, in vec3 ax, in vec3 bx, in vec3 cx, in vec3 dx, in float rx,
+    in float y, in vec3 ay, in vec3 by, in vec3 cy, in vec3 dy, in float ry
 )
 {
-    return ((ax + bx * cos(6.28318 * (cx * x + dx))) + (ay + by * cos(6.28318 * (cy * y + dy)))) * 0.5;
+    rx = radians(rx);
+    ry = radians(ry);
+    float xc = x - 0.5;
+    float yc = y - 0.5;
+
+    float cos_rx = cos(rx);
+    float sin_rx = sin(rx);
+    float x_rot = xc * cos_rx - yc * sin_rx + 0.5;
+    vec3 col_x = ax + bx * cos(6.28318 * (cx * x_rot + dx));
+
+    float cos_ry = cos(ry);
+    float sin_ry = sin(ry);
+    float y_rot = xc * sin_ry + yc * cos_ry + 0.5;
+    vec3 col_y = ay + by * cos(6.28318 * (cy * y_rot + dy));
+
+    return (col_x + col_y) * 0.5;
 }
 
 uniform float constantrx;
@@ -296,6 +329,7 @@ uniform float repeatbx;
 uniform float phaserx;
 uniform float phasegx;
 uniform float phasebx;
+uniform float rotx;
 uniform float constantry;
 uniform float constantgy;
 uniform float constantby;
@@ -308,12 +342,13 @@ uniform float repeatby;
 uniform float phasery;
 uniform float phasegy;
 uniform float phaseby;
+uniform float roty;
 
 void main() {
     vec2 p = gl_PointCoord.xy;
     vec3 col = pal(
-        p.x, vec3(constantrx,constantgx,constantbx), vec3(multirx,multigx,multibx), vec3(repeatrx,repeatgx,repeatbx), vec3(phaserx,phasegx,phasebx),
-        p.y, vec3(constantry,constantgy,constantby), vec3(multiry,multigy,multiby), vec3(repeatry,repeatgy,repeatby), vec3(phasery,phasegy,phaseby)
+        p.x, vec3(constantrx,constantgx,constantbx), vec3(multirx,multigx,multibx), vec3(repeatrx,repeatgx,repeatbx), vec3(phaserx,phasegx,phasebx), rotx,
+        p.y, vec3(constantry,constantgy,constantby), vec3(multiry,multigy,multiby), vec3(repeatry,repeatgy,repeatby), vec3(phasery,phasegy,phaseby), roty
     );
     gl_FragColor = vec4(col, 1.0);
 }
