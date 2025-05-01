@@ -6,6 +6,7 @@
     <style>
       body { font-family: monospace; font-size: 15px; }
       input[type="range"] { width: 100%; }
+      output { width: 4rem; }
       hr { margin: 0.15rem; }
       #slider-bundle { display: flex; gap: 1rem; }
       #slider { display: flex; flex-direction: column; }
@@ -13,9 +14,16 @@
   </head>
   <body>
     <div style="display: flex; justify-content: center; gap: 1rem;">
-      <canvas id="canvas" width="256" width="256" style="width: 256px; height: 256px; position: absolute; top: 100px; z-index: -1"></canvas>
-      <canvas id="cnv" width="768" height="768" style="border: 2px #000 solid; padding: 2px;"></canvas>
-<div style="width: 360px; height: 768px;">
+      <div>
+        <canvas id="canvas" width="256" width="256" style="width: 256px; height: 256px; position: absolute; top: 100px; left: 40%; z-index: -1"></canvas>
+        <canvas id="cnv" width="768" height="768" style="border: 2px #000 solid; padding: 2px;"></canvas>
+        <div style="display: flex; gap: 1rem; width: 384px; ">
+           <span>Blur</span>
+           <input id="blur" type="range" value="0" min="0" max="100" step="0.1" oninput="document.getElementById('blurv').value = this.value; draw();">
+           <output id="blurv">0</output>
+        </div>
+      </div>
+  <div style="width: 360px; height: 768px;">
     <p style="font-size: 11px;">Procedural 2D gradient based on a classic cosine palette formula. Uses WebGL for performance.</p>
     <hr>
     <h3 style="text-align: center; margin-bottom: 0;">X</h3>
@@ -28,60 +36,60 @@
     <div id="slider-bundle">
         <div id="slider">
             <input id="constantrx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantrxv').value = this.value; draw();">
-            <output id="constantrxv" style="width: 4rem;">0.5</output>
+            <output id="constantrxv">0.5</output>
         </div>
         <div id="slider">
             <input id="constantgx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantgxv').value = this.value; draw();">
-            <output id="constantgxv" style="width: 4rem;">0.5</output>
+            <output id="constantgxv">0.5</output>
         </div>
         <div id="slider">
             <input id="constantbx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantbxv').value = this.value; draw();">
-            <output id="constantbxv" style="width: 4rem;">0.5</output>
+            <output id="constantbxv">0.5</output>
         </div>
     </div>
     <span>Multiplier</span>
     <div id="slider-bundle">
         <div id="slider">
             <input id="multirx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multirxv').value = this.value; draw();">
-            <output id="multirxv" style="width: 4rem;">0.5</output>
+            <output id="multirxv">0.5</output>
         </div>
         <div id="slider">
             <input id="multigx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multigxv').value = this.value; draw();">
-            <output id="multigxv" style="width: 4rem;">0.5</output>
+            <output id="multigxv">0.5</output>
         </div>
         <div id="slider">
             <input id="multibx" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multibxv').value = this.value; draw();">
-            <output id="multibxv" style="width: 4rem;">0.5</output>
+            <output id="multibxv">0.5</output>
         </div>
     </div>
     <span>Repeat</span>
     <div id="slider-bundle">
         <div id="slider">
             <input id="repeatrx" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatrxv').value = this.value; draw();">
-            <output id="repeatrxv" style="width: 4rem;">1.0</output>
+            <output id="repeatrxv">1.0</output>
         </div>
         <div id="slider">
             <input id="repeatgx" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatgxv').value = this.value; draw();">
-            <output id="repeatgxv" style="width: 4rem;">1.0</output>
+            <output id="repeatgxv">1.0</output>
         </div>
         <div id="slider">
             <input id="repeatbx" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatbxv').value = this.value; draw();">
-            <output id="repeatbxv" style="width: 4rem;">1.0</output>
+            <output id="repeatbxv">1.0</output>
         </div>
     </div>
     <span>Phase</span>
     <div id="slider-bundle">
         <div id="slider">
             <input id="phaserx" type="range" value="0.0" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phaserxv').value = this.value; draw();">
-            <output id="phaserxv" style="width: 4rem;">0.0</output>
+            <output id="phaserxv">0.0</output>
         </div>
         <div id="slider">
             <input id="phasegx" type="range" value="0.67" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phasegxv').value = this.value; draw();">
-            <output id="phasegxv" style="width: 4rem;">0.67</output>
+            <output id="phasegxv">0.67</output>
         </div>
         <div id="slider">
             <input id="phasebx" type="range" value="0.33" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phasebxv').value = this.value; draw();">
-            <output id="phasebxv" style="width: 4rem;">0.33</output>
+            <output id="phasebxv">0.33</output>
         </div>
     </div>
     <div style="text-align: center;">Rotation</div>
@@ -96,60 +104,60 @@
     <div id="slider-bundle">
         <div id="slider">
             <input id="constantry" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantryv').value = this.value; draw();">
-            <output id="constantryv" style="width: 4rem;">0.5</output>
+            <output id="constantryv">0.5</output>
         </div>
         <div id="slider">
             <input id="constantgy" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantgyv').value = this.value; draw();">
-            <output id="constantgyv" style="width: 4rem;">0.5</output>
+            <output id="constantgyv">0.5</output>
         </div>
         <div id="slider">
             <input id="constantby" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('constantbyv').value = this.value; draw();">
-            <output id="constantbyv" style="width: 4rem;">0.5</output>
+            <output id="constantbyv">0.5</output>
         </div>
     </div>
     <span>Multiplier</span>
     <div id="slider-bundle">
         <div id="slider">
             <input id="multiry" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multiryv').value = this.value; draw();">
-            <output id="multiryv" style="width: 4rem;">0.5</output>
+            <output id="multiryv">0.5</output>
         </div>
         <div id="slider">
             <input id="multigy" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multigyv').value = this.value; draw();">
-            <output id="multigyv" style="width: 4rem;">0.5</output>
+            <output id="multigyv">0.5</output>
         </div>
         <div id="slider">
             <input id="multiby" type="range" value="0.5" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('multibyv').value = this.value; draw();">
-            <output id="multibyv" style="width: 4rem;">0.5</output>
+            <output id="multibyv">0.5</output>
         </div>
     </div>
     <span>Repeat</span>
     <div id="slider-bundle">
         <div id="slider">
             <input id="repeatry" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatryv').value = this.value; draw();">
-            <output id="repeatryv" style="width: 4rem;">1.0</output>
+            <output id="repeatryv">1.0</output>
         </div>
         <div id="slider">
             <input id="repeatgy" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatgyv').value = this.value; draw();">
-            <output id="repeatgyv" style="width: 4rem;">1.0</output>
+            <output id="repeatgyv">1.0</output>
         </div>
         <div id="slider">
             <input id="repeatby" type="range" value="1.0" min="0.0" max="8.0" step="1.0" oninput="document.getElementById('repeatbyv').value = this.value; draw();">
-            <output id="repeatbyv" style="width: 4rem;">1.0</output>
+            <output id="repeatbyv">1.0</output>
         </div>
     </div>
     <span>Phase</span>
     <div id="slider-bundle">
         <div id="slider">
             <input id="phasery" type="range" value="0.0" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phaseryv').value = this.value; draw();">
-            <output id="phaseryv" style="width: 4rem;">0.0</output>
+            <output id="phaseryv">0.0</output>
         </div>
         <div id="slider">
             <input id="phasegy" type="range" value="0.67" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phasegyv').value = this.value; draw();">
-            <output id="phasegyv" style="width: 4rem;">0.67</output>
+            <output id="phasegyv">0.67</output>
         </div>
         <div id="slider">
             <input id="phaseby" type="range" value="0.33" min="0.0" max="1.0" step="0.01" oninput="document.getElementById('phasebyv').value = this.value; draw();">
-            <output id="phasebyv" style="width: 4rem;">0.33</output>
+            <output id="phasebyv">0.33</output>
         </div>
     </div>
     <div style="text-align: center;">Rotation</div>
@@ -221,12 +229,26 @@ function draw() {
   var phasery = document.querySelector("#phasery"); var phaseryl = gl.getUniformLocation(program, "phasery"); gl.uniform1f(phaseryl, phasery.valueAsNumber);
   var phasegy = document.querySelector("#phasegy"); var phasegyl = gl.getUniformLocation(program, "phasegy"); gl.uniform1f(phasegyl, phasegy.valueAsNumber);
   var phaseby = document.querySelector("#phaseby"); var phasebyl = gl.getUniformLocation(program, "phaseby"); gl.uniform1f(phasebyl, phaseby.valueAsNumber);
-  var rotx = document.querySelector("#roty"); var rotyl = gl.getUniformLocation(program, "roty"); gl.uniform1f(rotyl, roty.valueAsNumber);
+  var roty = document.querySelector("#roty"); var rotyl = gl.getUniformLocation(program, "roty"); gl.uniform1f(rotyl, roty.valueAsNumber);
   gl.drawArrays(gl.POINTS, 0, 1);
 
   var newCanvas = document.querySelector('#cnv');
   var context = newCanvas.getContext('2d');
+  context.clearRect(0, 0, newCanvas.width, newCanvas.height);
+  var blur_value = document.querySelector("#blur").valueAsNumber;
+  if ( blur_value > 0 ) {
+    context.filter = `blur(${blur_value}px)`;
+  }
   context.drawImage(canvas, 0, 0, 768, 768);
+  context.filter = "none";
+  if ( blur_value > 0 ) {
+    var imageData = context.getImageData(0, 0, newCanvas.width, newCanvas.height);
+    var pixels = imageData.data;
+    for (let i = 3, n = newCanvas.width * newCanvas.height * 4; i < n; i += 4) {
+      pixels[i] = 255
+    }
+    context.putImageData(imageData, 0, 0);
+  }
 }
 
 function getRenderingContext() {
