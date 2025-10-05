@@ -11,10 +11,12 @@
   </head>
   <body>
     <div style="display: flex; justify-content: center; gap: 1rem;">
+      <div style="width: 240px;">
+        <p style="font-size: 11px; margin: 0;">Random art generator that is based on a very simple rule: it picks a value, then randomly chooses whether to repeat that value or pick a new random one. Then it chooses whether to repeat these two or pick entirely new ones. Then it repeats the same with four, eight, sixteen and so on. The end result is a pattern that is not entirely random, but looks as if it's made out of a limited set of elements. This 'semi-randomness' is characteristic for pretty much any human technology, from circuit boards to urban grids.</p>
+      </div>
       <canvas id="canvas" width="768" height="768" style="width: 768px; height: 768px; border: 2px #000 solid; padding: 2px;"></canvas>
       <div style="width: 360px;">
         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-          <p style="font-size: 11px; margin: 0;">Random art generator that is based on a very simple rule: it picks a value, then randomly chooses whether to repeat that value or pick a new random one. Then it chooses whether to repeat these two or pick entirely new ones. Then it repeats the same with four, eight, sixteen and so on. The end result is a pattern that is not entirely random, but looks as if it's made out of a limited set of elements. This 'semi-randomness' is characteristic for pretty much any human technology, from circuit boards to urban grids.</p>
           <hr style="width: 100%;">
           <div style="display: flex; justify-content: center; gap: 1rem;">
             <div style="display: flex; text-align: center; flex-direction: column;">
@@ -22,7 +24,7 @@
               <label for="scale1">1x</label>
             </div>
             <div style="display: flex; text-align: center; flex-direction: column;">
-              <input type="radio" id="2x" name="scale" oninput="params.delete(this.name); draw();" value="2" checked>
+              <input type="radio" id="2x" name="scale" oninput="{ params.delete(this.name); }; draw();" value="2" checked>
               <label for="scale2">2x</label>
             </div>
             <div style="display: flex; text-align: center; flex-direction: column;">
@@ -38,6 +40,7 @@
               <label for="symmetry">Symmetric</label>
             </div>
           </div>
+          <hr style="width: 100%;">
           <div style="display: flex; gap: 1rem;">
             <label>Random</label>
             <input type="range" id="regularity" min="0" max="1" value="0.5" step="0.01" oninput="if (this.value == 0 || this.value == 1) { document.getElementById('regularity-value').value = this.value.padEnd(4, '.00') } else { document.getElementById('regularity-value').value = this.value.padEnd(4, '0.0') }; params.set(this.id, this.value); if ( value == 0.5 ) { params.delete(this.id); }; draw();">
@@ -46,6 +49,7 @@
           <div style="display: flex; justify-content: center;">
             <output id="regularity-value" style="width: 1.5rem;">0.50</output>
           </div>
+          <hr style="width: 100%;">
           <div style="display: flex; gap: 1rem;">
             <label>Max&nbsp;repeats</label>
             <input type="range" id="copylimit" min="0" max="15" value="15" step="1" oninput="document.getElementById('copylimit-value').value = this.value; params.set(this.id, this.value); if ( value == 15 ) { params.delete(this.id); }; draw();">
@@ -65,18 +69,18 @@
           <div style="display: flex; justify-content: center;">
             <div style="display: flex; flex-direction: column;">
               <div style="display: flex;">
-                <input type="radio" id="gray" name="palette" oninput="params.delete(this.name); draw(); document.getElementById('palette_seed_block').style.display = 'none';" value="gray" checked><label for="gray">Grayscale</label>
+                <input type="radio" id="gray" name="palette" oninput="params.delete(this.name); draw(); document.getElementById('palette_seed').disabled = true;" value="gray" checked><label for="gray">Grayscale</label>
               </div>
               <div style="display: flex;">
-                <input type="radio" id="colorful" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed_block').style.display = 'flex';" value="colorful"><label for="colorful">Colorful</label>
+                <input type="radio" id="colorful" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed').disabled = false;" value="colorful"><label for="colorful">Colorful</label>
               </div>
             </div>
             <div style="display: flex; flex-direction: column;">
               <div style="display: flex;">
-                <input type="radio" id="gradient" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed_block').style.display = 'flex';" value="gradient"><label for="gradient">Gradient</label>
+                <input type="radio" id="gradient" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed').disabled = false;" value="gradient"><label for="gradient">Gradient</label>
               </div>
               <div style="display: flex;">
-                <input type="radio" id="gradient2d" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed_block').style.display = 'flex';" value="gradient2d"><label for="gradient2d">2d&nbsp;Gradient</label>
+                <input type="radio" id="gradient2d" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed').disabled = false;" value="gradient2d"><label for="gradient2d">2d&nbsp;Gradient</label>
               </div>
               <div style="display: flex;">
                 <input type="checkbox" id="dither" name="dither" oninput="if ( this.checked ) { params.set(this.name, this.id); } else { params.delete(this.id); }; draw();">
@@ -85,10 +89,10 @@
             </div>
             <div style="display: flex; flex-direction: column;">
               <div style="display: flex;">
-                <input type="radio" id="glitch" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed_block').style.display = 'flex';" value="glitch"><label for="glitch">Glitch</label>
+                <input type="radio" id="glitch" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed').disabled = false;" value="glitch"><label for="glitch">Glitch</label>
               </div>
               <div style="display: flex;">
-                <input type="radio" id="difference" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed_block').style.display = 'flex';" value="difference"><label for="difference">Difference</label>
+                <input type="radio" id="difference" name="palette" oninput="params.set(this.name, this.id); draw(); document.getElementById('palette_seed').disabled = false;" value="difference"><label for="difference">Difference</label>
               </div>
             </div>
           </div>
@@ -97,40 +101,48 @@
             <label>Colors&nbsp;</label>
             <input type="number" id="colors_num" oninput="params.set(this.id, this.value); if ( value == 2 ) { params.delete(this.id); }; draw();" min="2" max="256" value="2">
           </div>
-          <div style="display: none; gap: 1rem;" id="palette_seed_block">
+          <div style="display: flex; gap: 1rem;" id="palette_seed_block">
             <label>Palette</label>
-            <input type="number" id="palette_seed" oninput="params.set(this.id, this.value); if (this.value == '3') { params.delete('palette_seed'); }; draw();" value="3">
+            <input type="number" id="palette_seed" oninput="params.set(this.id, this.value); if (this.value == '3') { params.delete('palette_seed'); }; draw();" value="3" disabled>
             <input type="button" onclick="document.getElementById('palette_seed').value = Math.floor((Math.random() - 0.5) * Number.MAX_SAFE_INTEGER); params.set('palette_seed', document.getElementById('palette_seed').value); draw();" value="🎲" title="Randomize seed">
           </div>
           <hr style="width: 100%;">
           <div style="display: flex; justify-content: center;">
             <div style="display: flex; flex-direction: column; flex: auto;">
               <div style="display: flex;">
-                <input type="radio" id="column_order" name="order" oninput="params.delete(this.name); draw(); document.getElementById('block_patterns_h').style.display = 'flex';" checked>
+                <input type="radio" id="column_order" name="order" oninput="params.delete(this.name); draw(); document.getElementById('patterns_h').disabled = false;" checked>
                 <label for="column_order">Column-major <a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order">↪</a></label>
               </div>
               <div style="display: flex;">
-                <input type="radio" id="row_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('block_patterns_h').style.display = 'flex';">
+                <input type="radio" id="row_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = false;">
                 <label for="row_order">Row-major <a href="https://en.wikipedia.org/wiki/Row-_and_column-major_order">↪</a></label>
               </div>
               <div style="display: flex;">
-                <input type="radio" id="gray_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('block_patterns_h').style.display = 'flex';">
+                <input type="radio" id="gray_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = false;">
                 <label for="gray_order">Gray <a href="https://en.wikipedia.org/wiki/Gray_code#Two-dimensional_Gray_code">↪</a></label>
+              </div>
+              <div style="display: flex;">
+                <input type="radio" id="xormod_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
+                <label for="xormod_order">XORmod</label>
               </div>
             </div>
             <div style="display: flex; flex-direction: column; flex: auto;">
               <div style="display: flex;">
-                <input type="radio" id="z_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('block_patterns_h').style.display = 'none';">
+                <input type="radio" id="z_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
                 <label for="z_order">Z-order <a href="https://en.wikipedia.org/wiki/Z-order_curve">↪</a></label>
               </div>
               <div style="display: flex;">
-                <input type="radio" id="hilbert_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('block_patterns_h').style.display = 'none';">
+                <input type="radio" id="hilbert_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
                 <label for="hilbert_order">Hilbert <a href="https://en.wikipedia.org/wiki/Hilbert_curve">↪</a></label>
               </div>
               <div style="display: flex;">
-                <input type="radio" id="unnamed_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('block_patterns_h').style.display = 'none';">
-                <label for="unnamed_order">Unnamed</label>
+                <input type="radio" id="spiral_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
+                <label for="spiral_order">Spiral <a href="https://en.wikipedia.org/wiki/Ulam_spiral">↪</a></label>
               </div>
+              <!--<div style="display: flex;">
+                <input type="radio" id="peano_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
+                <label for="peano_order">Peano <a href="https://en.wikipedia.org/wiki/Peano_curve">↪</a></label>
+              </div>-->
             </div>
           </div>
           <div style="display: none;">
@@ -141,9 +153,9 @@
             <label>W</label><input type="range" id="patterns_w" min="0" max="7" value="0" step="1" oninput="
               document.getElementById('patterns_w-value').value = pattern_sizes[this.value];
               if (this.value > 0 || document.getElementById('patterns_h').value > 0) {
-                document.getElementById('pattern-control').style.display = 'block';
+                document.getElementById('patterns_num').disabled = false;
               } else {
-                document.getElementById('pattern-control').style.display = 'none';
+                document.getElementById('patterns_num').disabled = true;
               };
               params.set(this.id, this.value); if ( value == 0 ) { params.delete(this.id); };
               draw();">
@@ -153,31 +165,31 @@
             <label>H</label><input type="range" id="patterns_h" min="0" max="7" value="0" step="1" oninput="
               document.getElementById('patterns_h-value').value = pattern_sizes[this.value];
               if (this.value > 0 || document.getElementById('patterns_w').value > 0) {
-                document.getElementById('pattern-control').style.display = 'block';
+                document.getElementById('patterns_num').disabled = false;
               } else {
-                document.getElementById('pattern-control').style.display = 'none';
+                document.getElementById('patterns_num').disabled = true;
               };
               params.set(this.id, this.value); if ( value == 0 ) { params.delete(this.id); };
               draw();">
             <output id="patterns_h-value" style="width: 2rem;">1</output>
           </div>
-          <div id="pattern-control" style="display: none;">
+          <div id="pattern-control">
             <label>Patterns</label>
-            <input type="number" id="patterns_num" oninput="params.set(this.id, this.value); if ( value == 2 ) { params.delete(this.id); }; draw();" min="2" max="256" value="2">
+            <input type="number" id="patterns_num" oninput="params.set(this.id, this.value); if ( value == 2 ) { params.delete(this.id); }; draw();" min="2" max="256" value="2" disabled>
           </div>
           <hr style="width: 100%;">
           <div style="display: flex; justify-content: center;">
             <div style="display: flex; flex-direction: column; flex: auto;">
               <div>
-                <input type="radio" id="xy1" name="xy" oninput="params.delete(this.name); draw(); document.getElementById('block_bitwise').style.display = 'flex';" checked>
+                <input type="radio" id="xy1" name="xy" oninput="params.delete(this.name); draw(); document.querySelectorAll('[name*=bitwise]').forEach( x=> x.disabled = false );" checked>
                 <label for="xy1">x,y</label>
               </div>
               <div>
-                <input type="radio" id="xy2" name="xy" oninput="params.set(this.name, this.id); draw(); document.getElementById('block_bitwise').style.display = 'flex';">
+                <input type="radio" id="xy2" name="xy" oninput="params.set(this.name, this.id); draw(); document.querySelectorAll('[name*=bitwise]').forEach( x=> x.disabled = false );">
                 <label for="xy2">x<sup>2</sup>+y<sup>2</sup></label>
               </div>
               <div>
-                <input type="radio" id="xy3" name="xy" oninput="params.set(this.name, this.id); draw(); document.getElementById('block_bitwise').style.display = 'none';">
+                <input type="radio" id="xy3" name="xy" oninput="params.set(this.name, this.id); draw(); document.querySelectorAll('[name*=bitwise]').forEach( x=> x.disabled = true );">
                 <label for="xy3">x*y</label>
               </div>
             </div>
@@ -217,19 +229,35 @@
           </div>
           <hr style="width: 100%;">
             <div style="display: flex; justify-content: center; gap: 1.2rem;">
-              <input type="button" onclick="
-document.getElementById('regularity').value = Math.round(Math.random() * 100) / 100; document.getElementById('regularity-value').value = document.getElementById('regularity').value; params.set('regularity', document.getElementById('regularity').value);
-document.querySelectorAll('input[name=palette]')[Math.round(Math.random() * 5)].checked = true;
-document.getElementById('seed').value = Math.floor((Math.random() - 0.5) * Number.MAX_SAFE_INTEGER); params.set('seed', document.getElementById('seed').value);
-draw();
-" value="🎲" style="width: 7.2rem; font-size: 1.2rem" title="Randomize all">
-              <a href="randomrepeat-s-gray.html"><input type="button" value="↺" style="width: 7.2rem; font-size: 1.2rem" title="Reset all"></a>
+              <input type="button" onclick="randomize();" value="🎲" style="width: 7.2rem; font-size: 1.2rem" title="Randomize all">
+              <a href="randomrepeat.html"><input type="button" value="↺" style="width: 7.2rem; font-size: 1.2rem" title="Reset all"></a>
             </div>
         </div>
       </div>
     </div>
 
     <script type="application/javascript">
+      function randomize() {
+        document.getElementById('regularity').value = Math.round(Math.random() * 100) / 100;
+        document.getElementById('regularity-value').value = document.getElementById('regularity').value;
+        params.set('regularity', document.getElementById('regularity').value);
+
+        document.getElementById('seed').value = Math.floor((Math.random() - 0.5) * Number.MAX_SAFE_INTEGER);
+        params.set('seed', document.getElementById('seed').value);
+
+        document.getElementById('palette_seed').value = Math.floor((Math.random() - 0.5) * Number.MAX_SAFE_INTEGER);
+        document.getElementById('palette_seed').disabled = false;
+        params.set('palette_seed', document.getElementById('palette_seed').value);
+
+        el = document.querySelectorAll('input[name=palette]')[Math.round(Math.random() * 5)]
+        el.checked = true; params.set('palette', el.id);
+
+        el = document.querySelectorAll('input[name=order]')[Math.round(Math.random() * 5)]
+        el.checked = true; params.set('order', el.id);
+
+        draw();
+      }
+
       var pattern_sizes = [1, 2, 4, 8, 16, 32, 64, 128];
 
       var ctx = document.getElementById("canvas").getContext("2d", { alpha: false });
@@ -287,9 +315,69 @@ draw();
         return [y^(y>>1), x^(x>>1)];
       }
 
-      function unnamed(n, w, h) {
+      function spiral(n) {
+        if ( n == 0 ) {
+          return [0, 0];
+        } else if ( n == 1 ) {
+          return [0, 1];
+        }
+
+        k = Math.ceil((Math.sqrt(n) - 1) / 2);
+
+        side_len = 2 * k + 1;
+        max_val = side_len ** 2;
+        offset = max_val - n;
+
+        side_len_minus = side_len - 1;
+        side = Math.floor(offset / side_len_minus);
+        pos  = offset % side_len_minus;
+
+        if ( side == 0 ) {
+          var x = k - pos;
+          var y = -k;
+        } else if ( side == 1 ) {
+          var x = -k;
+          var y = -k + pos;
+        } else if ( side == 2 ) {
+          var x = -k + pos;
+          var y = k;
+        } else {
+          var x = k;
+          var y = k - pos;
+        }
+
+        return [y, x];
+      }
+
+      function xormod(n, w, h) {
         var x = parseInt(n/h)^n%w;
+        //var y = parseInt(n%h); // slightly different looks
         var y = parseInt(n/h);
+        return [y, x];
+      }
+
+      function peano_curve(index) {
+        const order = 7;
+        let x = 0, y = 0;
+        let scale = Math.pow(3, order - 1);
+        for (let level = 0; level < order; ++level) {
+ 
+         const divisor = Math.pow(9, order - level - 1);
+          const pair = Math.floor(index / divisor);
+          index %= divisor;
+
+          const dX = pair % 3;
+          const dY = Math.floor(pair / 3);
+
+          const col = (dY === 1) ? 2 - dX : dX;
+          const row = (dX === 1) ? 2 - dY : dY;
+
+          x += col * scale;
+          y += row * scale;
+
+          scale = Math.floor(scale / 3);
+        }
+
         return [y, x];
       }
 
@@ -391,7 +479,7 @@ draw();
         var regularity = document.getElementById("regularity").value * 100;
         var patterns_w = pattern_sizes[document.getElementById("patterns_w").value];
         var patterns_h = pattern_sizes[document.getElementById("patterns_h").value];
-        if (order == 'z_order' || order == 'hilbert_order' || order == 'unnamed_order') {
+        if (order == 'z_order' || order == 'hilbert_order' || order == 'spiral_order' || order == 'peano_order' || order == 'xormod_order') {
           patterns_h = patterns_w;
         }
         if (patterns_w == 1 && patterns_h == 1) {
@@ -513,19 +601,6 @@ draw();
           }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
       	var ctx_w = 768;
       	var ctx_h = 768;
         ctx.fillStyle = "rgb(255, 255, 255)";
@@ -554,8 +629,13 @@ draw();
               crd = hilbert_curve(y*h+x);
             } else if (order == "gray_order") {
               crd = gray_2d(x, y);
-            } else if (order == "unnamed_order") {
-              crd = unnamed(y*h+x, w, h);
+            } else if (order == "spiral_order") {
+              var crd1 = spiral(y*h+x);
+              crd = [crd1[0] + Math.floor(384 / scale), crd1[1] + Math.floor(384 / scale)];
+            } else if (order == "peano_order") {
+              crd = peano_curve(y*h+x);
+            } else if (order == "xormod_order") {
+              crd = xormod(y*h+x, w, h);
             }
 
             var pattern = patterns[seq[y*h+x]];
@@ -613,8 +693,16 @@ draw();
                     var p_crd = gray_2d(p_x, p_y);
                     x1 = (crd[0]*patterns_w+p_crd[1])*scale;
                     y1 = (crd[1]*patterns_h+p_crd[0])*scale;
-                  } else if (order == "unnamed_order") {
-                    var p_crd = unnamed(p_y*patterns_h+p_x, patterns_w, patterns_h);
+                  } else if (order == "spiral_order") {
+                    var p_crd = spiral(p_y*patterns_h+p_x, patterns_w, patterns_h);
+                    x1 = (crd[0]*patterns_h+p_crd[1])*scale - 192 * (patterns_w * 2 - 2);
+                    y1 = (crd[1]*patterns_w+p_crd[0])*scale - 192 * (patterns_w * 2 - 2);
+                  } else if (order == "peano_order") {
+                    var p_crd = peano_curve(p_y*patterns_h+p_x);
+                    x1 = (crd[0]*patterns_h+p_crd[1])*scale;
+                    y1 = (crd[1]*patterns_w+p_crd[0])*scale;
+                  } else if (order == "xormod_order") {
+                    var p_crd = xormod(p_y*patterns_h+p_x, patterns_w, patterns_h);
                     x1 = (crd[0]*patterns_h+p_crd[1])*scale;
                     y1 = (crd[1]*patterns_w+p_crd[0])*scale;
                   }
