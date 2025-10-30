@@ -125,24 +125,32 @@
                 <input type="radio" id="xormod_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
                 <label for="xormod_order">XORmod</label>
               </div>
+              <div style="display: flex;">
+                <input type="radio" id="spiral_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
+                <label for="spiral_order">Spiral <a href="https://en.wikipedia.org/wiki/Ulam_spiral">↪</a></label>
+              </div>
             </div>
             <div style="display: flex; flex-direction: column; flex: auto;">
-              <div style="display: flex;">
-                <input type="radio" id="z_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
-                <label for="z_order">Z-order <a href="https://en.wikipedia.org/wiki/Z-order_curve">↪</a></label>
-              </div>
               <div style="display: flex;">
                 <input type="radio" id="hilbert_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
                 <label for="hilbert_order">Hilbert <a href="https://en.wikipedia.org/wiki/Hilbert_curve">↪</a></label>
               </div>
               <div style="display: flex;">
-                <input type="radio" id="spiral_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
-                <label for="spiral_order">Spiral <a href="https://en.wikipedia.org/wiki/Ulam_spiral">↪</a></label>
+                <input type="radio" id="z_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
+                <label for="z_order">Z-order <a href="https://en.wikipedia.org/wiki/Z-order_curve">↪</a></label>
               </div>
-              <!--<div style="display: flex;">
+              <div style="display: flex;">
+                <input type="radio" id="corput_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = false;">
+                <label for="corput_order">Corput <a href="https://en.wikipedia.org/wiki/Van_der_Corput_sequence">↪</a></label>
+              </div>
+              <div style="display: flex;">
                 <input type="radio" id="peano_order" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
                 <label for="peano_order">Peano <a href="https://en.wikipedia.org/wiki/Peano_curve">↪</a></label>
-              </div>-->
+              </div>
+              <div style="display: flex;">
+                <input type="radio" id="peano_order2" name="order" oninput="params.set(this.name, this.id); draw(); document.getElementById('patterns_h').disabled = true;">
+                <label for="peano_order2">Peano II <a href="https://en.wikipedia.org/wiki/Peano_curve">↪</a></label>
+              </div>
             </div>
           </div>
           <div style="display: none;">
@@ -349,6 +357,29 @@
         return [y, x];
       }
 
+      function corput_order(x, y, scale, patterns_w, patterns_h) {
+
+        var output_x = 0.0;
+        var output_increment_x = 1 / 2;
+        while (x > 0) {
+          least_significant_digit = x % 2;
+          output_x += least_significant_digit * output_increment_x;
+          x = x >> 1;
+          output_increment_x /= 2;
+        }
+
+        var output_y = 0.0;
+        var output_increment_y = 1 / 2;
+        while (y > 0) {
+          least_significant_digit = y % 2;
+          output_y += least_significant_digit * output_increment_y;
+          y = y >> 1;
+          output_increment_y /= 2;
+        }
+
+        return [Math.ceil(output_y * (1024 / scale / patterns_w)), Math.ceil(output_x * (1024 / scale / patterns_h))];
+      }
+
       function xormod(n, w, h) {
         var x = parseInt(n/h)^n%w;
         //var y = parseInt(n%h); // slightly different looks
@@ -356,29 +387,58 @@
         return [y, x];
       }
 
-      function peano_curve(index) {
-        const order = 7;
-        let x = 0, y = 0;
-        let scale = Math.pow(3, order - 1);
-        for (let level = 0; level < order; ++level) {
- 
-         const divisor = Math.pow(9, order - level - 1);
-          const pair = Math.floor(index / divisor);
-          index %= divisor;
+      function peano_curve(i, scale) {
+        let lvls = 7, x1 = 0, y1 = 0;
 
-          const dX = pair % 3;
-          const dY = Math.floor(pair / 3);
-
-          const col = (dY === 1) ? 2 - dX : dX;
-          const row = (dX === 1) ? 2 - dY : dY;
-
-          x += col * scale;
-          y += row * scale;
-
-          scale = Math.floor(scale / 3);
+        for (let lvl = 0; lvl < lvls; ++lvl) {
+          l = lvls - lvl - 1;
+          x = Math.floor(i / (9 ** l * 3)) % 3;
+          y = Math.floor(i / (9 ** l * 1)) % 3;
+          if ( x % 2 ) {
+            y = 2 - y;
+          }
+          if ( x1 % 2 ) {
+            y = 2 - y;
+          }
+          if ( y1 % 2 ) {
+            x = 2 - x;
+          }
+          x1 += x * 3 ** l;
+          y1 += y * 3 ** l;
         }
 
-        return [y, x];
+        return [y1, x1];
+      }
+
+      function peano_curve2(i, scale) {
+        let lvls = 7, x1 = 0, y1 = 0;
+
+        for (let lvl = 0; lvl < lvls; ++lvl) {
+          l = lvls - lvl - 1;
+          if ( x1 % 2 - y1 % 2 == 0 ) {
+            x = Math.floor(i / (9 ** l * 3)) % 3;
+            y = Math.floor(i / (9 ** l * 1)) % 3;
+            if ( x % 2 ) {
+              y = 2 - y;
+            }
+          } else {
+            x = Math.floor(i / (9 ** l * 1)) % 3;
+            y = Math.floor(i / (9 ** l * 3)) % 3;
+            if ( y % 2 ) {
+              x = 2 - x;
+            }
+          }
+          if ( x1 % 2 ) {
+            y = 2 - y;
+          }
+          if ( y1 % 2 ) {
+            x = 2 - x;
+          }
+          x1 += x * 3 ** l;
+          y1 += y * 3 ** l;
+        }
+
+        return [y1, x1];
       }
 
       function toHex(a) {
@@ -479,7 +539,7 @@
         var regularity = document.getElementById("regularity").value * 100;
         var patterns_w = pattern_sizes[document.getElementById("patterns_w").value];
         var patterns_h = pattern_sizes[document.getElementById("patterns_h").value];
-        if (order == 'z_order' || order == 'hilbert_order' || order == 'spiral_order' || order == 'peano_order' || order == 'xormod_order') {
+        if (order == 'z_order' || order == 'hilbert_order' || order == 'spiral_order' || order == 'peano_order' || order == 'peano_order2' || order == 'corput_order' || order == 'xormod_order') {
           patterns_h = patterns_w;
         }
         if (patterns_w == 1 && patterns_h == 1) {
@@ -609,13 +669,13 @@
 
         var w = Math.ceil(1024 / scale / patterns_w);
         var h = Math.ceil(1024 / scale / patterns_h);
-        var seq = random_repeat(w * h / 2, patterns_num);
+        var seq = random_repeat(w * h, patterns_num);
 
         var i = 0;
 
-        for (let y = 0; y < w; y++) {
+        for (let y = 0; y < w*2; y++) {
 
-          for (let x = 0; x < h; x++) {
+          for (let x = 0; x < h*2; x++) {
 
             var crd = [y, x];
 
@@ -633,7 +693,11 @@
               var crd1 = spiral(y*h+x);
               crd = [crd1[0] + Math.floor(384 / scale), crd1[1] + Math.floor(384 / scale)];
             } else if (order == "peano_order") {
-              crd = peano_curve(y*h+x);
+              crd = peano_curve(y*h+x, scale);
+            } else if (order == "peano_order2") {
+              crd = peano_curve2(y*h+x, scale);
+            } else if (order == "corput_order") {
+              crd = corput_order(x, y, scale, 1, 1);
             } else if (order == "xormod_order") {
               crd = xormod(y*h+x, w, h);
             }
@@ -698,9 +762,17 @@
                     x1 = (crd[0]*patterns_h+p_crd[1])*scale - 192 * (patterns_w * 2 - 2);
                     y1 = (crd[1]*patterns_w+p_crd[0])*scale - 192 * (patterns_w * 2 - 2);
                   } else if (order == "peano_order") {
-                    var p_crd = peano_curve(p_y*patterns_h+p_x);
+                    var p_crd = peano_curve(p_y*patterns_h+p_x, scale);
                     x1 = (crd[0]*patterns_h+p_crd[1])*scale;
                     y1 = (crd[1]*patterns_w+p_crd[0])*scale;
+                  } else if (order == "peano_order2") {
+                    var p_crd = peano_curve2(p_y*patterns_h+p_x, scale);
+                    x1 = (crd[0]*patterns_h+p_crd[1])*scale;
+                    y1 = (crd[1]*patterns_w+p_crd[0])*scale;
+                  } else if (order == "corput_order") {
+                    var p_crd = corput_order(p_x, p_y, scale, patterns_w, patterns_h);
+                    x1 = (crd[0]*patterns_h+p_crd[1])/scale;
+                    y1 = (crd[1]*patterns_w+p_crd[0])/scale;
                   } else if (order == "xormod_order") {
                     var p_crd = xormod(p_y*patterns_h+p_x, patterns_w, patterns_h);
                     x1 = (crd[0]*patterns_h+p_crd[1])*scale;
